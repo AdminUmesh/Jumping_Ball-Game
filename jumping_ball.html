@@ -1,0 +1,150 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Funny balls - Gravity in canvas</title>
+  <style>
+    body, html 
+{
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden
+}
+#button{
+    float: right;
+}
+#number{
+    text-align: center;
+}
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <input type="number" id="number" placeholder="Enter NO Of Balls:" required>
+  <button id="button" onclick="myFunction()" value="submit">Play</button>
+  <script>
+    // Script
+    document.getElementById("number").style.display = "none";
+var canvas = document.querySelector('canvas');
+var c = canvas.getContext('2d'); //used to obtain the rendering context and its drawing functions
+
+canvas.width = innerWidth;
+canvas.height = innerHeight-45;
+
+
+// Variables
+
+
+var colors = [
+    'red',
+    'green',
+    '#820333',
+    '#C9283E',
+  '#F0433A'
+];
+
+var gravity = 0.5;
+var friction = 0.8;
+
+var count=0;
+var numb;
+// Event Listeners
+function myFunction(){
+    numb=document.querySelector("#number").value;
+}
+document.querySelector("#button").addEventListener("click", function() {
+    count++;
+    
+    var x = document.getElementById("number");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+     } else {
+        x.style.display = "none";
+    }
+    if(count=2){
+        init();
+    }
+    //numb=document.querySelector('number').value;
+});
+
+
+// Utility Functions
+function randomIntFromRange(min,max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function randomColor(colors) {
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function Ball(x, y, dx, dy, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
+
+    this.update = function() {
+        if (this.y + this.radius + this.dy> canvas.height) {
+            this.dy = -this.dy;
+            this.dy = this.dy * friction;
+            this.dx = this.dx * friction;
+        } else {
+            this.dy += gravity;
+        }
+
+        if (this.x + this.radius >= canvas.width || this.x - this.radius <= 0) {
+            this.dx = -this.dx * friction;
+        }
+
+        this.x += this.dx;
+        this.y += this.dy;
+        this.draw();
+    };
+
+    this.draw = function() {
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);  
+        c.fillStyle = this.color;
+        c.fill();
+        c.closePath();
+    };
+}
+
+
+// Implementation
+var ballArray = [];
+
+function init() {
+    ballArray = [];
+
+    for (let i = 0; i < numb; i++) {
+        var radius =randomIntFromRange(10, 20);
+        var x =randomIntFromRange(radius, canvas.width - radius);  //right
+        var y = randomIntFromRange(0,0);      //0=up
+        var dx =randomIntFromRange(-3, 3)     //left right
+        var dy =randomIntFromRange(-2, 2)          //up-down
+        ballArray.push(new Ball(x, y, dx, dy, radius, randomColor(colors)));
+    }
+}
+
+// Animation Loop                                                       
+function animate() {
+    requestAnimationFrame(animate);
+
+    c.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < ballArray.length; i++) {
+        ballArray[i].update();
+    }
+}
+
+init();
+animate();
+  </script>
+</body>
+
+</html>
